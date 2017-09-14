@@ -1,4 +1,4 @@
-**Behavioral Cloning Project**
+# Behavioral Cloning Project
 
 Overview
 ---
@@ -11,16 +11,17 @@ The goals / steps of this project are the following:
 * Test that the model successfully drives around track one without leaving the road
 * Summarize the results with a written report
 
-
 [//]: # (Image References)
 
 [imageNormal]: ./examples/steering_angle_0p2.png "Example of center lane driving (steering angle 0.2)."
 [imageCropped]: ./examples/cropped_image.png "Image after cropping out irrelevant portions (e.g., trees and the car hood)."
-[imageOverfitting]: ./examples/training_and_validation_loss_without_dropout.gif "Without dropout, training loss is lower than validation loss, indicating overfitting."
-[imageNotOverfitting]: ./examples/training_and_validation_loss.gif "With dropout, both training and validation loss continue to decrease."
-[imageReflected]: ./examples/reflected_image.gif "An image reflected about the vertical axis (reflected steering angle -0.2)."
-[imageRecoveryTurn]: ./examples/recovery_image.gif "An image collected during a recovery turn (steering angle -0.53)."
+[imageOverfitting]: ./examples/training_and_validation_loss_without_dropout.png "Without dropout, training loss is lower than validation loss, indicating overfitting."
+[imageNotOverfitting]: ./examples/training_and_validation_loss.png "With dropout, both training and validation loss continue to decrease."
+[imageReflected]: ./examples/reflected_image.png "An image reflected about the vertical axis (reflected steering angle -0.2)."
+[imageRecoveryTurn]: ./examples/recovery_image.png "An image collected during a recovery turn (steering angle -0.53)."
 [imageDrivingGIF]: ./examples/video.gif "Performance on the challenge video"
+[imageUnsuccessful]: ./examples/unsuccessful_model.png "A simpler model with only two convolutional layers and maxpooling could not successfully complete the track."
+[imageSuccessful]: ./examples/successful_model.png "A convolutional neural network based on NVIDIA's PilotNet successfully completed the track."
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -31,10 +32,10 @@ The goals / steps of this project are the following:
 #### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
-* [model.py] containing the script to create and train the model
-* [drive.py] for driving the car in autonomous mode
-* [model.h5] containing a trained convolution neural network 
-* [README.md, this document], a writeup report summarizing the results
+* [model.py](https://github.com/marcbadger/CarND-Behavioral-Cloning-P3/blob/master/model.py) containing the script to create and train the model
+* [drive.py](https://github.com/marcbadger/CarND-Behavioral-Cloning-P3/blob/master/drive.py) for driving the car in autonomous mode
+* [model.h5](https://github.com/marcbadger/CarND-Behavioral-Cloning-P3/blob/master/model.h5) containing a trained convolution neural network 
+* [README.md, this document](https://github.com/marcbadger/CarND-Behavioral-Cloning-P3/blob/master/README.md), a writeup report summarizing the results
 
 #### 2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
@@ -52,9 +53,10 @@ The model.py file contains the code for training and saving the convolution neur
 
 I started with NVIDIA's PilotNet, as suggested in project resources. PilotNet is a convolution neural network with 5 convolutional layers (each followed by a RELU layer) and 3 fully conected layers (model.py lines XX-XX).  The first 3 convolutional layers have 24, 36, and 48 channels, 5x5 filter sizes, and 2x2 stride, which reduces the feature size.  The last 2 convolutional layers have 64 channels, 3x3 filter sizes, and are not strided.  The three fully connected layers in my model have 120, 84, and 1 neurons, respectively.  Note that the ouput is only 1 dimensional (rather than 10 dimensional) because all we are controlling in this project is steering angle. See [Bojarski et al. 2017](https://arxiv.org/pdf/1704.07911.pdf) for further details.
 
-In addition to the layers used by Bojarski et al., I also normalized data in the model using a Keras lambda layer (code line XX), cropped the input to limit input to relevant regions (cropping out trees and the car hood, e.g.) of the image (code line XX, Figure XX), and included dropout layers (code line XX).
+In addition to the layers used by Bojarski et al., I also normalized data in the model using a Keras lambda layer (code line XX), included dropout layers (code line XX), and cropped the input to limit input to relevant regions (cropping out trees and the car hood, e.g.) of the image (code line XX, see images below).
 
 ![alt text][imageNormal]
+
 ![alt text][imageCropped]
 
 #### 2. Attempts to reduce overfitting in the model
@@ -120,36 +122,13 @@ After retraining for 5 epochs on the new data it worked and the car successfully
 ####3. Ablation Studies to Evaluate Contributions of the Data and Model Components
 Based on a few ablation studies, data augmentation (in this case, reflection about the vertical axis), the recovery data, and eliminating about 55% of the samples with steering angles between -0.03 and 0.03 were all necessary for the car to successfully navigate the track (models trained in these configurations are included as model_noRecoveryData.h6 and model_noTurningBias.h5).
 
-I also tried a smaller model (shown below), but it definitely gave worse results. Using the smaller model, the car exhibited more pinballing behavior and it ran off the track before the first turn (model_smallerModel.h5).
+I also tried a smaller model (shown below) with only two convolutional layers and maxpooling, but it definitely gave worse results when trained using the same data. Using the smaller model, the car exhibited more pinballing behavior and it ran off the track before the first turn (model_smallerModel.h5).
 
 Smaller model that didn't work:
-model = Sequential()
-model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160,320,3)))
-model.add(Cropping2D(cropping=((70,25),(0,0))))
-model.add(Convolution2D(6,5,5,activation="relu"))
-model.add(MaxPooling2D())
-model.add(Convolution2D(6,5,5,activation="relu"))
-model.add(MaxPooling2D())
-model.add(Flatten())
-model.add(Dense(120))
-model.add(Dense(84))
-model.add(Dense(1))
+![alt text][imageUnsuccessful]
 
-Larger NVIDIA model that worked:
-model = Sequential()
-model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=(160,320,3)))
-model.add(Cropping2D(cropping=((70,25),(0,0))))
-model.add(Convolution2D(24,5,5,subsample=(2,2),activation="relu"))
-model.add(Convolution2D(36,5,5,subsample=(2,2),activation="relu"))
-model.add(Convolution2D(48,5,5,subsample=(2,2),activation="relu"))
-model.add(Convolution2D(64,3,3,activation="relu"))
-model.add(Convolution2D(64,3,3,activation="relu"))
-model.add(Flatten())
-model.add(Dense(120))
-model.add(Dropout(0.5))
-model.add(Dense(84))
-model.add(Dropout(0.5))
-model.add(Dense(1))
+Larger NVIDIA PilotNet model that worked:
+![alt text][imageSuccessful]
 
 ### Conclusion
 I achieved the goal of this project, which was to train a neural network to successfully drive a car around a simple track, but my model failed miserably on the harder track.  My experience with project really highlights the importance of having appropriate training data, and saving data in a way that allows you to trace unwanted behaviors back to specific samples in your training set.  It would be interesting to see if the model has the capacity to generalize to the harder track given enough good training data.
