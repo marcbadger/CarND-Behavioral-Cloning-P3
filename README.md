@@ -74,9 +74,9 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 #### 4. Appropriate training data
 
 Collecting appropriate training data was the most difficult part of this project. What ultimately worked was two laps of VERY careful center lane driving at 9 mph, along with 10-20 segments recorded while recovering from various angles of approach at the difficult turns. The final dataset I trained on consisted of:
-Number of frames for two laps at 9 mph: 5457, giving ~32.7k samples after including left, center, and right views and their reflections.
-Number of frames for two laps at 9 mph after eliminating 55% of angles between -0.03 and 0.03: 4253, giving 25.5k samples.
-Number of frames for recovery samples: 408, giving 2.4k samples (note that turn-biased sampling was not performed on these recovery segments).
+* 5457 frames drawn from two laps at 9 mph. Giving ~32.7k samples after including left, center, and right views and their reflections.
+* 4253 frames drawn from two laps at 9 mph after eliminating 55% of angles between -0.03 and 0.03. Giving 25.5k samples.
+* 408 frames drawn from recovery maneuvers. Giving 2.4k samples (note that turn-biased sampling was not performed on these recovery segments).
 
 Data were split into training (80%) and validation (20%) sets using sklearn. Data were also randomly shuffled before being input to the generator and each batch returned by the generator was also shuffled.
 
