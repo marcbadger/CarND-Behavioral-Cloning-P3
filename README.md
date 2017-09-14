@@ -122,7 +122,11 @@ After retraining for 5 epochs on the new data it worked and the car successfully
 ![alt text][imageDrivingGIF]
 
 #### 3. Ablation Studies to Evaluate Contributions of the Data and Model Components
-Based on a few ablation studies, data augmentation (in this case, reflection about the vertical axis), the recovery data, and eliminating about 55% of the samples with steering angles between -0.03 and 0.03 were all necessary for the car to successfully navigate the track (models trained in these configurations are included as model_noRecoveryData.h6 and model_noTurningBias.h5).
+Based on a few ablation studies, 
+* data augmentation (in this case, reflection about the vertical axis),
+* the recovery data, and 
+* eliminating about 55% of the samples with steering angles between -0.03 and 0.03
+were all necessary for the car to successfully navigate the track (models trained in these configurations are included as model_noRecoveryData.h6 and model_noTurningBias.h5).
 
 I also tried a smaller model (shown below) with only two convolutional layers and maxpooling, but it definitely gave worse results when trained using the same data. Using the smaller model, the car exhibited more pinballing behavior and it ran off the track before the first turn (model_smallerModel.h5).
 
