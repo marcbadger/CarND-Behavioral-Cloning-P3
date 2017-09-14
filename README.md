@@ -2,9 +2,9 @@
 
 Overview
 ---
-This repository contains files for the Behavioral Cloning Project. A detailed writeup of the project is continued in this document below.
+This repository contains files for the Behavioral Cloning Project. A detailed writeup of the project is given below.
 
-The goals / steps of this project are the following:
+The goals / steps of this project were to:
 * Use the simulator to collect data of good driving behavior
 * Build, a convolution neural network in Keras that predicts steering angles from images
 * Train and validate the model with a training and validation set
@@ -24,7 +24,7 @@ The goals / steps of this project are the following:
 [imageSuccessful]: ./examples/successful_model.png "A convolutional neural network based on NVIDIA's PilotNet successfully completed the track."
 
 ## Rubric Points
-### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
+Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ---
 ### Files Submitted & Code Quality
@@ -51,23 +51,25 @@ The model.py file contains the code for training and saving the convolution neur
 
 #### 1. Final Model Architecture
 
-I started with NVIDIA's PilotNet, as suggested in project resources. PilotNet is a convolution neural network with 5 convolutional layers (each followed by a RELU layer) and 3 fully conected layers (model.py lines XX-XX).  The first 3 convolutional layers have 24, 36, and 48 channels, 5x5 filter sizes, and 2x2 stride, which reduces the feature size.  The last 2 convolutional layers have 64 channels, 3x3 filter sizes, and are not strided.  The three fully connected layers in my model have 120, 84, and 1 neurons, respectively.  Note that the ouput is only 1 dimensional (rather than 10 dimensional) because all we are controlling in this project is steering angle. See [Bojarski et al. 2017](https://arxiv.org/pdf/1704.07911.pdf) for further details.
+I started with NVIDIA's PilotNet, as suggested in project resources. PilotNet is a convolution neural network with 5 convolutional layers (each followed by a RELU layer) and 3 fully conected layers (model.py lines 111-121).  The first 3 convolutional layers have 24, 36, and 48 channels, 5x5 filter sizes, and 2x2 stride, which reduces the feature size.  The last 2 convolutional layers have 64 channels, 3x3 filter sizes, and are not strided.  The three fully connected layers in my model have 120, 84, and 1 neurons, respectively.  Note that the ouput is only 1 dimensional (rather than 10 dimensional) because all we are controlling in this project is steering angle. See [Bojarski et al. 2017](https://arxiv.org/pdf/1704.07911.pdf) for further details.
 
-In addition to the layers used by Bojarski et al., I also normalized data in the model using a Keras lambda layer (code line XX), included dropout layers (code line XX), and cropped the input to limit input to relevant regions (cropping out trees and the car hood, e.g.) of the image (code line XX, see images below).
+In addition to the layers used by Bojarski et al., I also normalized data in the model using a Keras lambda layer (code line 109), included dropout layers (code lines 118, 120), and cropped the input to limit input to relevant regions (cropping out trees and the car hood, e.g.) of the image (code line 110, see images below).
 
+*Original:
 ![alt text][imageNormal]
 
+*Cropped:
 ![alt text][imageCropped]
 
 #### 2. Attempts to reduce overfitting in the model
 
-The model contains dropout layers in order to reduce overfitting (model.py lines XX). 
+The model contains dropout layers in order to reduce overfitting (model.py lines 118, 120). 
 
-The model was trained and validated on different data sets to measure whether the model was overfitting (code line XX, XX). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained and validated on different data sets to measure whether the model was overfitting (code line 32, 101-102, 142-146). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 #### 3. Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line XX).
+The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 139).
 
 #### 4. Appropriate training data
 
@@ -78,17 +80,17 @@ Number of frames for recovery samples: 408, giving 2.4k samples (note that turn-
 
 Data were split into training (80%) and validation (20%) sets using sklearn. Data were also randomly shuffled before being input to the generator and each batch returned by the generator was also shuffled.
 
-Because the dataset was too large to load into memory all at once, I used a Python generator to load samples only when they were needed. The generator handles: 1) loading all three views (code lines XX-XX), 2) adding steering correction for the right and left views (code lines XX-XX), and 3) augmenting the data by reflecting the images and steering angles (code lines XX-XX).
+Because the dataset was too large to load into memory all at once, I used a Python generator to load samples only when they were needed. The generator handles: 1) loading all three views (code lines 53-63), 2) adding steering correction for the right and left views (code lines 64-65), and 3) augmenting the data by reflecting the images and steering angles (code lines 68-80).
 
 For details about how I collected the training data, see the next section. 
 
-### Model Architecture and Training Strategy
+### Approach Towards a Successful Solution
 
-#### 1. Solution Design Approach
+#### 1. Initial Architecture
 
 I started with NVIDIA PilotNet architecture, as suggested in project resources. I trained for 5 epochs on two forward loops and one backward loop (using 3 camera views and flipping images and steering commands) for a total of 3*2*3347 ~ 20k samples). The resulting behavior seemed to do fairly well and made it to the bridge.  But then it ran into the side of the bridge. Because the car seemed to not be turning enough, I hypothesized that all the samples of straight driving were biasing the model to go straight when it shouldn't have been. To aleviate this problem, I i) increased the turning parameter for side images form 0.1 to 0.2 and ii) altered my training dataset so that samples with straight steering commands would be undersampled.  To do so, I kept all samples with turning angles less than -0.03 or more than 0.03 and randomly kept only 45% of the samples with steering angles in between. Although this approach did allow the car to get past the bridge, it had the unfortunate consequence of causing the car to pinball slightly around the lane.
 
-When assessing the training and validation error, I noticed that my model was overfitting (see Figure XX)
+When assessing the training and validation error, I noticed that my model was overfitting (see image below).
 
 ![alt text][imageOverfitting]
 
@@ -96,7 +98,7 @@ Once I included dropout layers after each fully connected layer, the training er
 
 ![alt text][imageNotOverfitting]
 
-####2. Creation of the Training Set
+#### 2. Creation of the Training Set
 I started using left, center, and right views with reflections of these images about the vertical axis (steering angles were also reflected). Reflections were an easy way to double the training data. An example of a reflected image is below
 
 ![alt text][imageReflected]
@@ -109,7 +111,7 @@ Next, I borrowed a nice computer mouse and recorded two more laps driving at 9 m
 
 ![alt text][imageNormal]
 
- I also completed 10-20 recovery sequences at the locations of difficult turns. An example of one of these recovery turns is below (turning angle XX).
+ I also completed 10-20 recovery sequences at the locations of difficult turns. An example of one of these recovery turns is below (turning angle -0.53).
 
 ![alt text][imageRecoveryTurn]
 
@@ -119,15 +121,17 @@ After retraining for 5 epochs on the new data it worked and the car successfully
 
 ![alt text][imageDrivingGIF]
 
-####3. Ablation Studies to Evaluate Contributions of the Data and Model Components
+#### 3. Ablation Studies to Evaluate Contributions of the Data and Model Components
 Based on a few ablation studies, data augmentation (in this case, reflection about the vertical axis), the recovery data, and eliminating about 55% of the samples with steering angles between -0.03 and 0.03 were all necessary for the car to successfully navigate the track (models trained in these configurations are included as model_noRecoveryData.h6 and model_noTurningBias.h5).
 
 I also tried a smaller model (shown below) with only two convolutional layers and maxpooling, but it definitely gave worse results when trained using the same data. Using the smaller model, the car exhibited more pinballing behavior and it ran off the track before the first turn (model_smallerModel.h5).
 
 Smaller model that didn't work:
+
 ![alt text][imageUnsuccessful]
 
 Larger NVIDIA PilotNet model that worked:
+
 ![alt text][imageSuccessful]
 
 ### Conclusion
