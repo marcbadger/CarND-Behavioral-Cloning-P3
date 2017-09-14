@@ -55,10 +55,10 @@ I started with NVIDIA's PilotNet, as suggested in project resources. PilotNet is
 
 In addition to the layers used by Bojarski et al., I also normalized data in the model using a Keras lambda layer (code line 109), included dropout layers (code lines 118, 120), and cropped the input to limit input to relevant regions (cropping out trees and the car hood, e.g.) of the image (code line 110, see images below).
 
-*Original:
+* Original:
 ![alt text][imageNormal]
 
-*Cropped:
+* Cropped:
 ![alt text][imageCropped]
 
 #### 2. Attempts to reduce overfitting in the model
