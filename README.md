@@ -20,8 +20,8 @@ The goals / steps of this project were to:
 [imageReflected]: ./examples/reflected_image.png "An image reflected about the vertical axis (reflected steering angle -0.2)."
 [imageRecoveryTurn]: ./examples/recovery_image.png "An image collected during a recovery turn (steering angle -0.53)."
 [imageDrivingGIF]: ./examples/video.gif "Performance on the challenge video"
-[imageUnsuccessful]: ./examples/unsuccessful_model.png "A simpler model with only two convolutional layers and maxpooling could not successfully complete the track."
-[imageSuccessful]: ./examples/successful_model.png "A convolutional neural network based on NVIDIA's PilotNet successfully completed the track."
+[imageUnsuccessful]: ./examples/unsuccessful_model.PNG "A simpler model with only two convolutional layers and maxpooling could not successfully complete the track."
+[imageSuccessful]: ./examples/successful_model.PNG "A convolutional neural network based on NVIDIA's PilotNet successfully completed the track."
 
 ## Rubric Points
 Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
